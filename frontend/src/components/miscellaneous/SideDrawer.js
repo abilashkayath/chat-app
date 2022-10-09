@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Input } from "@chakra-ui/input";
@@ -35,6 +36,7 @@ import { ChatState } from "../../Context/ChatProvider";
 function SideDrawer() {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
 
@@ -50,6 +52,10 @@ function SideDrawer() {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const history = useHistory();
+
+  useEffect(() => {
+    getTotalUserCount();
+  }, []);
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
@@ -122,6 +128,19 @@ function SideDrawer() {
     }
   };
 
+  const getTotalUserCount = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.get(`/api/chat/all`, config);
+      setCount(data.count);
+    } catch (error) {}
+  };
+
   return (
     <>
       <Box
@@ -141,9 +160,14 @@ function SideDrawer() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Talk-A-Tive
-        </Text>
+        <Box d="flex" justifyContent="" alignItems="center">
+          <Tooltip label={`A total count of ${count} users actively using this app`} hasArrow placement="bottom-end">
+            <Text fontSize="2xl" fontFamily="Work sans">
+              Talk-A-Tive
+            </Text>
+          </Tooltip>
+        </Box>
+
         <div>
           <Menu>
             <MenuButton p={1}>

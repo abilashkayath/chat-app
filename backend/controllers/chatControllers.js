@@ -74,6 +74,22 @@ const fetchChats = asyncHandler(async (req, res) => {
   }
 });
 
+//@description     Fetch all chats for a user
+//@route           GET /api/chat/all
+//@access          Protected
+const fetchAllChats = asyncHandler(async (req, res) => {
+  try {
+    const count = await Chat.countDocuments({});
+
+    Chat.find(null, null, { limit: 2 }).then(async (results) => {
+      res.status(200).send({ items: results, count });
+    });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 //@description     Create New Group Chat
 //@route           POST /api/chat/group
 //@access          Protected
@@ -200,4 +216,5 @@ module.exports = {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  fetchAllChats,
 };
